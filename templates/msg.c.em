@@ -88,9 +88,9 @@ bool @(msg_underscored_name)_decode(const CanardRxTransfer* transfer, @(msg_c_ty
 @[      elif field.type.category == field.type.CATEGORY_ARRAY]@
 @[        if field.type.mode == field.type.MODE_DYNAMIC]@
 @(ind)msg.@(field.name).len = (@(c_array_len_type(field)))random_range_unsigned_val(0, @(field.type.max_size));
-@(ind)for (size_t i=0; i < msg.@(field.name).len; i++) {
+@(ind)size_t i; for (i=0; i < msg.@(field.name).len; i++) {
 @[        else]@
-@(ind)for (size_t i=0; i < @(field.type.max_size); i++) {
+@(ind)size_t i; for (i=0; i < @(field.type.max_size); i++) {
 @[        end if]@
 @{indent += 1}@{ind = '    '*indent}@
 @[        if field.type.value_type.category == field.type.value_type.CATEGORY_PRIMITIVE]@

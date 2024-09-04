@@ -86,6 +86,7 @@ void _@(msg_underscored_name)_encode(uint8_t* buffer, uint32_t* bit_ofs, @(msg_c
 @(ind)(void)bit_ofs;
 @(ind)(void)msg;
 @(ind)(void)tao;
+@(ind)size_t i;
 
 @[  if msg_union]@
 @(ind)@(union_msg_tag_uint_type_from_num_fields(len(msg_fields))) union_tag = msg->union_tag;
@@ -114,10 +115,14 @@ void _@(msg_underscored_name)_encode(uint8_t* buffer, uint32_t* bit_ofs, @(msg_c
 @(ind)*bit_ofs += @(field.type.bitlen);
 @[      elif field.type.category == field.type.CATEGORY_ARRAY]@
 @[        if field.type.mode == field.type.MODE_DYNAMIC]@
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 @(ind)const @(c_array_len_type(field)) @(field.name)_len = msg->@(field.name).len > @(field.type.max_size) ? @(field.type.max_size) : msg->@(field.name).len;
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 @[          if field == msg_fields[-1] and field.type.value_type.get_min_bitlen() >= 8]@
 @(ind)if (!tao) {
 @{indent += 1}@{ind = '    '*indent}@
@@ -128,9 +133,9 @@ void _@(msg_underscored_name)_encode(uint8_t* buffer, uint32_t* bit_ofs, @(msg_c
 @{indent -= 1}@{ind = '    '*indent}@
 @(ind)}
 @[          end if]@
-@(ind)for (size_t i=0; i < @(field.name)_len; i++) {
+@(ind)for (i=0; i < @(field.name)_len; i++) {
 @[        else]@
-@(ind)for (size_t i=0; i < @(field.type.max_size); i++) {
+@(ind)for (i=0; i < @(field.type.max_size); i++) {
 @[        end if]@
 @{indent += 1}@{ind = '    '*indent}@
 @[        if field.type.value_type.category == field.type.value_type.CATEGORY_PRIMITIVE]@
@@ -173,16 +178,21 @@ bool _@(msg_underscored_name)_decode(const CanardRxTransfer* transfer, uint32_t*
 @(ind)(void)bit_ofs;
 @(ind)(void)msg;
 @(ind)(void)tao;
+@(ind)size_t i;
 @[  if msg_union]@
 @(ind)@(union_msg_tag_uint_type_from_num_fields(len(msg_fields))) union_tag;
 @(ind)canardDecodeScalar(transfer, *bit_ofs, @(union_msg_tag_bitlen_from_num_fields(len(msg_fields))), false, &union_tag);
 @(ind)*bit_ofs += @(union_msg_tag_bitlen_from_num_fields(len(msg_fields)));
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 @(ind)if (union_tag >= @(len(msg_fields))) {
 @(ind)    return true; /* invalid value */
 @(ind)}
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 @(ind)msg->union_tag = (enum @(msg_underscored_name)_type_t)union_tag;
 
 @(ind)switch(msg->union_tag) {
@@ -246,15 +256,19 @@ bool _@(msg_underscored_name)_decode(const CanardRxTransfer* transfer, uint32_t*
 @[                  end if]@
 @{indent += 1}@{ind = '    '*indent}@
 @[              end if]@
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 @(ind)if (msg->@(field.name).len > @(field.type.max_size)) {
 @(ind)    return true; /* invalid value */
 @(ind)}
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
-@(ind)for (size_t i=0; i < msg->@(field.name).len; i++) {
+#endif
+@(ind)for (i=0; i < msg->@(field.name).len; i++) {
 @[        else]@
-@(ind)for (size_t i=0; i < @(field.type.max_size); i++) {
+@(ind)for (i=0; i < @(field.type.max_size); i++) {
 @[        end if]@
 @{indent += 1}@{ind = '    '*indent}@
 @[        if field.type.value_type.category == field.type.value_type.CATEGORY_PRIMITIVE]@

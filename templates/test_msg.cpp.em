@@ -65,7 +65,7 @@ int64_t random_bitlen_signed_val(uint8_t bitlen) {
 // Convert Binary data to Hex string
 std::string hex_string(const std::vector<uint8_t>& data) {
     std::stringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
+    size_t i; for (i = 0; i < data.size(); ++i) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)data[i];
     }
     return ss.str();
@@ -74,7 +74,7 @@ std::string hex_string(const std::vector<uint8_t>& data) {
 // Convert Hex string to Binary data
 std::vector<uint8_t> hex_data(const std::string& str) {
     std::vector<uint8_t> data;
-    for (size_t i = 0; i < str.size(); i += 2) {
+        size_t i; for (i = 0; i < str.size(); i += 2) {
         std::string byte = str.substr(i, 2);
         data.push_back(static_cast<uint8_t>(std::stoul(byte, nullptr, 16)));
     }
